@@ -42,7 +42,7 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: "http://127.0.0.1:3000/auth/github/callback"
+      callbackURL: "http://localhost:3000/auth/github/callback"
     },
     function(accessToken, refreshToken, profile, done) {
       User.findOrCreate(
@@ -66,20 +66,11 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-//github routes
-router.get("/github", passport.authenticate("github"));
-
-router.get(
-  "/github/callback",
-  passport.authenticate("github", {
-    successRedirect: "/",
-    failureRedirect: "/login"
-  })
-);
-
 //routes
 const indexRouter = require("./routes/index");
 app.use("/", indexRouter);
+const authRouter = require("./routes/auth")(passport);
+app.use("/auth", authRouter);
 
 // Set up express-handlebars
 const exphbs = require("express-handlebars");
